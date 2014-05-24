@@ -1,0 +1,28 @@
+import(methods)
+import(rJava)
+import(stream)
+
+
+export(
+  DSC_DenStream,
+  DSC_CluStream,
+  DSC_ClusTree,
+	
+  DSD_RandomRBFGeneratorEvents
+)
+
+### S3 Methods
+S3method(get_points, DSD_MOA)
+S3method(microToMacro, DSC_CluStream)
+S3method(microToMacro, DSC_DenStream)
+S3method(get_copy, DSC_MOA)
+
+### so stream dispatches correcly
+S3method(get_microclusters, DSC_MOA)
+S3method(get_microweights, DSC_MOA)
+S3method(.cluster, DSC_MOA)
+
+S3method(get_macroclusters, DSC_DenStream)
+S3method(get_macroweights, DSC_DenStream)
+S3method(get_macroclusters, DSC_CluStream)
+S3method(get_macroweights, DSC_CluStream)
