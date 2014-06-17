@@ -59,35 +59,25 @@ DSC_CluStream <- function(
   l
 }
 
+
+
 get_macroclusters.DSC_CluStream <- function(x, ...) {
   if(is.null(x$macro$macro)) stop("No k_macro set!")
-  
-  if(x$macro$newdata) {
-    recluster(x$macro$macro, x, overwrite=TRUE)
-    x$macro$newdata <- FALSE
-  }
-  
+  .update_reclustering(x)
+ 
   get_centers(x$macro$macro, type="macro")
 }
 
 get_macroweights.DSC_CluStream <- function(x, ...) {
   if(is.null(x$macro$macro)) stop("No k_macro set!")
-
-  if(x$macro$newdata) {
-    recluster(x$macro$macro, x, overwrite=TRUE)
-    x$macro$newdata <- FALSE
-  }
+  .update_reclustering(x)
   
   get_weights(x$macro$macro, type="macro")
 }
 
 microToMacro.DSC_CluStream <- function(x, micro=NULL) {
   if(is.null(x$macro$macro)) stop("No k set!")
-
-  if(x$macro$newdata) {
-    recluster(x$macro$macro, x, overwrite=TRUE)
-    x$macro$newdata <- FALSE
-  }
+  .update_reclustering(x)
   
   microToMacro(x$macro$macro, micro)  
 }

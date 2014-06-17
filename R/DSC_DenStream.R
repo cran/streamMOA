@@ -18,26 +18,21 @@
 
 
 # denstream options:
-# -h horizon "Range of the window."  1000
 # -e epsilon 	0.01 (defines the epsilon neighborhood, range: 0 to 1)
 # -p minPoints 	10 (min. num. points a cluster must have)
 # -b beta	0.001 (range: 0 to 1)
 # -m mu		1 (range: 0 to max(double))
+# -l lambda (range: 0 to 1)
 # -i initPoints	10000 (number of points to use for initialization)
 
 
-DSC_DenStream <- function(epsilon,  mu=1, beta=0.001, lambda=0.001,
-  initPoints=100, offline=2, processingSpeed=100) {
+DSC_DenStream <- function(epsilon,  mu=1, beta=0.2, lambda=0.001,
+  initPoints=100, offline=2, processingSpeed=1) {
   #, minPoints=10) {
   
-  ### note: we do not use horizon!
+  ### note:DenStream does not use horizon anymore!
   horizon <- 1000
-  if (horizon < 1) stop("invalid horizon, range: >= 1")
-  if (epsilon <= 0) stop("invalid epsilon")
-#  if (minPoints < 0) stop("invalid minPoints, must be > 0")
-  if (beta <= 0 || beta >= 1) stop("invalid beta, range: 0 < beta < 1 ")
-  if (mu <= 0) stop("invalid mu, must be > 0")
-  if (initPoints < 0) stop("invalid initPoints, must be > 0")
+  ### Java code does checking
   
   paramList <- list(
     h = horizon,
@@ -70,35 +65,26 @@ DSC_DenStream <- function(epsilon,  mu=1, beta=0.001, lambda=0.001,
     )
   
   l$macro$newdata <- FALSE
-  l$macro$macro <-DSC_Hierarchical(h=(2+1e-9)*epsilon, method="single") 
+  l$macro$macro <-DSC_Hierarchical(h=(offline+1e-9)*epsilon, method="single") 
   
   class(l) <- c("DSC_DenStream","DSC_Micro","DSC_MOA","DSC")
   l
 }
 
 get_macroclusters.DSC_DenStream <- function(x, ...) {
-  if(x$macro$newdata) {
-    recluster(x$macro$macro, x, overwrite=TRUE)
-    x$macro$newdata <- FALSE
-  }
+  .update_reclustering(x)
   
   get_centers(x$macro$macro, type="macro")
 }
 
 get_macroweights.DSC_DenStream <- function(x, ...) {
-  if(x$macro$newdata) {
-    recluster(x$macro$macro, x, overwrite=TRUE)
-    x$macro$newdata <- FALSE
-  }
+  .update_reclustering(x)
   
   get_weights(x$macro$macro, type="macro")
 }
 
 microToMacro.DSC_DenStream <- function(x, micro=NULL) {
-  if(x$macro$newdata) {
-    recluster(x$macro$macro, x, overwrite=TRUE)
-    x$macro$newdata <- FALSE
-  }
+  .update_reclustering(x)
 
   microToMacro(x$macro$macro, micro)  
 }

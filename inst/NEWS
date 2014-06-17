@@ -1,3 +1,8 @@
-Initial version 0.1-0
+Initial version 0.1-1 (6/17/14)
+    * applied changes in stream 1.0-2
+    * MOA clusterers now report and plot assignment radii. 
+    * improved vignette
+
+Initial version 0.1-0 (6/10/14)
     * Moved MOA related code to this package
     * updated to MOA Release 2014.04 
