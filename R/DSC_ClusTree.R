@@ -25,17 +25,11 @@
 
 DSC_ClusTree <- function(horizon=1000, maxHeight=8, lambda=NULL) {
 
-  # error checking
-  if (maxHeight < 0) {
-    stop("invalid maxHeight")
-  }
-
-  if (horizon < 0) {
-    stop("invalid horizon")
-  }
-
-  paramList <- list(h=horizon,
-                    H=maxHeight)
+  ### Java code does parameter checking
+  paramList <- list(
+    h=horizon,
+    H=maxHeight
+  )
 
   # converting the param list to a cli string to use in java
   cliParams <- convert_params(paramList)
@@ -46,14 +40,17 @@ DSC_ClusTree <- function(horizon=1000, maxHeight=8, lambda=NULL) {
   .jcall(options, "V", "setViaCLIString", cliParams)
   .jcall(clusterer, "V", "prepareForUse")
 
+  # overwrite lambda
   if(!is.null(lambda))
   	.jfield(clusterer,"negLambda") <- -1*lambda
 
   # initializing the R object
-  l <- list(description = "ClusTree",
-            options = cliParams,
-            javaObj = clusterer)
-
-  class(l) <- c("DSC_ClusTree","DSC_Micro","DSC_MOA","DSC")
-  l  
+  structure(
+    list(
+      description = "ClusTree",
+      options = cliParams,
+      javaObj = clusterer
+    ),
+    class = c("DSC_ClusTree","DSC_Micro","DSC_MOA","DSC")
+  )
 }

@@ -41,27 +41,35 @@ convert_params <- function(paramList=list()) {
   cliParams <- substr(cliParams, 1, nchar(cliParams)-1)
 }
 
-### this is called by cluster in stream!
-.cluster.DSC_MOA <- function(dsc, dsd, n, verbose=FALSE, ...) {
-  ## data has to be all doubles for MOA clusterers!
-  for (i in 1:n) {
+### update
+update.DSC_MOA <- function(object, dsd, n, verbose=FALSE, ...) {
+  if(n>=1) {
+    
+    if(!is(dsd, "DSD_data.frame"))
+      stop("Cannot cluster stream (need a DSD_data.frame.)")
     
     
-    d <- get_points(dsd, 1)
-    ## TODO: Check incoming data
+    ## data has to be all doubles for MOA clusterers!
+    for (i in 1:n) {
+      
+      d <- get_points(dsd, 1)
+      ## TODO: Check incoming data
+      
+      x <- .jcast(
+        .jnew("weka/core/DenseInstance", 1.0, .jarray(as.double(d))),
+        "weka/core/Instance"
+      )
+      
+      .jcall(object$javaObj, "V", "trainOnInstanceImpl", x)
+      
+      if(verbose && !i%%1000) cat("Processed", i, "points -",
+        nclusters(object), "clusters\n")
+      
+    }	
     
-    
-    x <- .jcast(
-      .jnew("weka/core/DenseInstance", 1.0, .jarray(as.double(d))),
-      "weka/core/Instance"
-    )
-    
-    .jcall(dsc$javaObj, "V", "trainOnInstanceImpl", x)
-    
-    if(verbose && !i%%1000) cat("Processed", i, "points -",
-                                nclusters(dsc), "clusters\n")
-    
-  }	
+  }
+  # so cl <- cluster(cl, ...) also works
+  invisible(object)
 }
 
 

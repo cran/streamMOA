@@ -53,28 +53,28 @@ Clustering. In Journal of Machine Learning Research (JMLR).
 
 \examples{
 # 3 clusters with 5% noise
-dsd <- DSD_Gaussians(k=3, d=2, noise=.05)
+stream <- DSD_Gaussians(k=3, d=2, noise=.05)
 
 # cluster with CluStream  
-dsc <- DSC_CluStream(m=50)
-cluster(dsc, dsd, 500)
-dsc
+clustream <- DSC_CluStream(m=50)
+update(clustream, stream, 500)
+clustream
 
 # plot micro-clusters
-plot(dsc, dsd)
+plot(clustream, stream)
 
 # plot assignment area (micro-cluster radius)
-plot(dsc, dsd, assignment=TRUE, weights=FALSE)
+plot(clustream, stream, assignment=TRUE, weights=FALSE)
   
 # reclustering. Use weighted k-means for CluStream
 kmeans <- DSC_Kmeans(k=3, weighted=TRUE)
-recluster(kmeans, dsc)
-plot(kmeans, dsd, type="both")
+recluster(kmeans, clustream)
+plot(kmeans, stream, type="both")
   
 # use k-means automatically
-dsc <- DSC_CluStream(m=50, k=3)
-cluster(dsc, dsd, 500)
-dsc
+clustream <- DSC_CluStream(m=50, k=3)
+update(clustream, stream, 500)
+clustream
 
-plot(dsc, dsd, type="both")
+plot(clustream, stream, type="both")
 }

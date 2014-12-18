@@ -1,3 +1,6 @@
+Initial version 1.0-0 (12/18/14)
+    * interface with stream changed. We use now update.DSC_MOA, etc.
+
 Initial version 0.1-1 (6/17/14)
     * applied changes in stream 1.0-2
     * MOA clusterers now report and plot assignment radii. 

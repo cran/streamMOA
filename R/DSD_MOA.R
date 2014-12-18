@@ -18,14 +18,18 @@
 
 DSD_MOA <- function(...) stop("DSD_MOA is an abstract class and cannot be instantiated!")
 
-get_points.DSD_MOA <- function(x, n=1, assignment=FALSE, ...) {
+get_points.DSD_MOA <- function(x, n=1, 
+  outofpoints=c("stop", "warn", "ignore"),
+  cluster=FALSE, class=FALSE, ...) {
 	
+  ### MOA streams cannot be out of points.
+  
 	if (n < 1) stop("n must be > 0")
 	
 	# pre-allocating the space for the matrix
 	data <- matrix(NA, nrow=n, ncol=x$d)
 	
-	if(assignment) a <- numeric()
+	a <- integer(n)
 
 	# unpackaging the java instances
 	for (i in 1:n) {
@@ -33,20 +37,15 @@ get_points.DSD_MOA <- function(x, n=1, assignment=FALSE, ...) {
 		row <- .jcall(instance, "[D", "toDoubleArray")
 		class <- .jcall(instance, "D", "classValue")
 		data[i,] <- row[1:x$d]
-		
-		if(assignment) {
-			 a[i] <- class
-		}
+		a[i] <- class
 	}
 
 	data <- data.frame(data)
+  a <- a + 1L
+  a[a>x$k] <- NA_integer_
 	
-  if(assignment) {
-    a <- a + 1L
-    ### make noise NA
-    a[a>x$k] <- NA
-    attr(data,"assignment") <- a
-  }
+  if(cluster) attr(data, "cluster") <- a
+  if(class) data <- cbind(data, class = a)
 	
 	data
 }

@@ -22,7 +22,7 @@ evaluation on a data stream with concept drift (clusters evolve over time).
 
 First, we set up a static data set. 
 We extract 1500 data points from the Bars and Gaussians data stream generator 
-with 5\% noise and put them in a \code{DSD_Wrapper}. The wrapper is used
+with 5\% noise and put them in a \code{DSD_Memory}. The wrapper is used
 to replay the same part of the data stream for each algorithm.
 We will use the first
 1000 points to learn the clustering and the remaining 500 points for
@@ -34,9 +34,9 @@ set.seed(1000)
 
 <<data_bng, fig=TRUE, include=FALSE>>= 
 library("stream") 
-dsd <- DSD_Wrapper(DSD_BarsAndGaussians(noise=0.05), n=1500)
-dsd
-plot(dsd)
+stream <- DSD_Memory(DSD_BarsAndGaussians(noise=0.05), n=1500)
+stream
+plot(stream)
 @
 
 \begin{figure} 
@@ -55,8 +55,8 @@ We initialize four algorithms from \pkg{stream}. We choose the parameters
 experimentally so that the algorithm produce each (approximately) 100 micro-clusters. 
 
 <<>>= 
-sample <- DSC_Sample(k=100) 
-window <- DSC_Window(horizon=100)
+sample <- DSC_TwoStage(micro=DSC_Sample(k=100), macro=DSC_Kmeans(k=4)) 
+window <- DSC_TwoStage(micro=DSC_Window(horizon=100), macro=DSC_Kmeans(k=4))
 dstream <- DSC_DStream(gridsize=.7)
 tNN <- DSC_tNN(r=.5)
 @
@@ -77,14 +77,14 @@ each time before we cluster.
 algorithms <- list(Sample=sample, Window=window, 'D-Stream'=dstream, tNN=tNN, 
   DenStream=denstream, CluStream=clustream)
 for(a in algorithms) {
-  reset_stream(dsd) 
-  cluster(a, dsd, 1000)
+  reset_stream(stream) 
+  update(a, stream, 1000)
 }
 @
 
 We use \code{nclusters()} to inspect the number of micro-clusters.
 <<>>=
-sapply(algorithms, nclusters)
+sapply(algorithms, nclusters, type="micro")
 @
 
 All algorithms except DenStream produce around 100 micro-clusters.
@@ -98,8 +98,8 @@ original data.
 op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
-  reset_stream(dsd) 
-  plot(a, dsd, main=a$description)
+  reset_stream(stream) 
+  plot(a, stream, main=a$description, type="micro")
 }
 par(op)
 @
@@ -139,8 +139,8 @@ We also disable showing micro-cluster weights to make the plot clearer.
 op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
-  reset_stream(dsd) 
-  plot(a, dsd, main=a$description, assignment=TRUE, weight=FALSE)
+  reset_stream(stream) 
+  plot(a, stream, main=a$description, assignment=TRUE, weight=FALSE, type="micro")
 }
 par(op)
 @
@@ -168,10 +168,10 @@ we want to use data points not seen by the algorithms for evaluation.
 
 <<>>=
 sapply(algorithms, FUN=function(a) {
-  reset_stream(dsd, 1001) 
-  evaluate(a, dsd, 
+  reset_stream(stream, 1001) 
+  evaluate(a, stream, 
     measure=c("numMicroClusters", "purity", "SSQ", "silhouette"), 
-    n=500, assignmentMethod="auto")
+    n=500, assignmentMethod="auto", type="micro")
 })
 @
 
@@ -195,22 +195,13 @@ $k=4$ when we initialized \code{DSC_DenStream} above).
 For sampling and window we apply here weighted
 $k$-means reclustering with $k=4$, the true number of clusters.
 
-<<>>=
-sample_km <- DSC_Kmeans(k=4, description="Sample + weighted k-means")
-recluster(sample_km, algorithms$Sample)
-algorithms$Sample <- sample_km 
-
-window_km <- DSC_Kmeans(k=4, description= "Window + weighted k-means")
-recluster(window_km, algorithms$Window)
-algorithms$Window <- window_km 
-@
 
 <<macroclusters, fig=TRUE, include=FALSE, width=8, height=12>>= 
 op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
-  reset_stream(dsd) 
-  plot(a, dsd, main=a$description, type="both")
+  reset_stream(stream) 
+  plot(a, stream, main=a$description, type="both")
 }
 par(op)
 @
@@ -231,8 +222,8 @@ correctly, but split the lower density clusters into multiple pieces.
 
 <<>>=
 sapply(algorithms, FUN=function(a) {
-  reset_stream(dsd, 1001) 
-  evaluate(a, dsd, measure=c("numMacroClusters","purity", "SSQ", "cRand"), 
+  reset_stream(stream, 1001) 
+  evaluate(a, stream, measure=c("numMacroClusters","purity", "SSQ", "cRand"), 
     n=500, assign="micro", type="macro")
 })
 @
@@ -240,97 +231,7 @@ sapply(algorithms, FUN=function(a) {
 The evaluation measures at the macro-cluster level reflect the findings from the 
 visual analysis of the clustering with D-Stream producing the best results.
 
-% 
-% 
-% Next, we will look at macro-clusters. Some algorithms in \pkg{stream} already 
-% have a reclustering algorithm implemented. For example, 
-% DenStream uses the reachability defined by DBSCAN. D-Stream
-% reclusters by merging adjacent dense grids. 
-% CluStream uses weighted $k$-means.   
-% All three clustering algorithms 
-% already produce macro-clusters and can be directly used for analysis.
-% pling we choose here to use hierarchical reclustering with 
-% complete-link and cutting the dendrogram to form 3 clusters.
-% 
-% <<>>=  
-% sample_hc <- DSC_Hierarchical(k=4, method="complete")
-% recluster(sample_hc, sample)
-% @
-% 
-% We plot the final clusterings for visual inspection.
-% 
-% <<sample_hc, fig=TRUE, include=FALSE>>= 
-% reset_stream(dsd) 
-% plot(sample_hc, dsd, type="both") 
-% @
-% 
-% <<denstream_dbscan, fig=TRUE, include=FALSE>>= 
-% reset_stream(dsd) 
-% plot(denstream, dsd, type="macro") 
-% @
-% 
-% <<clustream_kmeans, fig=TRUE, include=FALSE>>= 
-% reset_stream(dsd) 
-% plot(clustream, dsd, type="macro") 
-% @
-% 
-% <<dstream_grids, fig=TRUE, include=FALSE>>= 
-% reset_stream(dsd) 
-% plot(dstream, dsd, type="macro") 
-% @
-% 
-% \begin{figure} \begin{minipage}[b]{.48\linewidth} \centering
-% \includegraphics{streamMOA-sample_hc} \\(a) Sampling with hierarchical clustering 
-% \end{minipage}
-% \begin{minipage}[b]{.48\linewidth} \centering
-% \includegraphics{streamMOA-denstream_dbscan} \\(b) DenStream with reachability
-% \end{minipage}
-% 
-% \begin{minipage}[b]{.48\linewidth} \centering
-% \includegraphics{streamMOA-clustream_kmeans} \\(c) CluStream with weighted $k$-means
-% \end{minipage}
-% \begin{minipage}[b]{.48\linewidth} \centering
-% \includegraphics{streamMOA-dstream_grids} \\(d) D-Stream with merged dense grids
-% \end{minipage}
-% 
-% \caption{Reclustering results.} 
-% \label{figure:denstream+clustream+kmeans} 
-% \end{figure}
-% 
-% 
-% The final clusters are shown in Figure \ref{figure:denstream+clustream+kmeans}.
-% We see that the micro-clusters are for DenStream and CluStream are evenly 
-% distribution than the random sampling. 
-% DStream also forms dense grids 
-% in the most dense areas.
-% DenStream and DStream suppress noise well, while
-% CluStream also selects some noise points for micro-clusters.
-% These plots help with analyzing how micro-clusters
-% are placed and can help with ``debugging'' problems with micro-cluster
-% placement in new algorithms.
-% 
-% Finally, we can compare the clusterings using \code{evaluate}.
-% 
-% <<>>= 
-% sapply(list('Sample+HC'=sample_hc,
-%   DenStream=denstream, 
-%   CluStream=clustream, 
-%   DStream=dstream), 
-% FUN=function(x){
-%     reset_stream(dsd)
-%     evaluate(x, dsd, c("numMicroclusters", "numMacroclusters", 
-%       "purity", "crand", "SSQ"), type="macro", assign="micro")
-% })
-% @
-% 
-% From the evaluation results we see that sampling with hierarchical reclustering and CluStream perform best.  
-% However, this is only due to the fact that we specified for these algorithms 
-% the correct number of macro clusters and that the reclustering algorithms
-% prefer spherical clusters which matches the generating model for the data.
-% The density-based
-% algorithms (DenStream and D-Stream) are not ther able to separate the overlapping 
-% clusters or create small macro-clusters for poorly connected
-% micro-clusters. 
+
 
 \section{Experimental Comparison using an Evolving Data Stream} 
 \label{examples:full_evolving}
@@ -344,16 +245,16 @@ the center of the data space.
 
 <<>>=
 set.seed(0)
-dsd <- DSD_Wrapper(DSD_Benchmark(1), 5000)
+stream <- DSD_Memory(DSD_Benchmark(1), 5000)
 @
 
 
 
 <<moa1, fig=TRUE, include=FALSE, echo=FALSE>>=
-plot(dsd, 250, xlim=c(0,1), ylim=c(0,1))
+plot(stream, 250, xlim=c(0,1), ylim=c(0,1))
 arrows(.15,.85,.85,.15, col=rgb(.8,.8,.8,.6), lwd=10)
 arrows(.15,.15,.85,.85, col=rgb(.8,.8,.8,.6), lwd=10)
-reset_stream(dsd)
+reset_stream(stream)
 @
 
 \begin{figure}
@@ -370,13 +271,17 @@ Figure~\ref{figure:dsd_bench} illustrates the structure of the data stream.
 Next, we define the clustering algorithms.
 
 <<>>=
-sample <- DSC_Sample(k=100, biased=TRUE) 
-window <- DSC_Window(horizon=100, lambda=.01)
-
-dstream <- DSC_DStream(gridsize=.05, lambda=.01)
-tNN <- DSC_tNN(r=.02, lambda=.01)
-denstream <- DSC_DenStream(epsilon=.05, lambda=.01) 
-clustream <- DSC_CluStream(m=100, k=2) 
+algorithms <- list(
+  Sample = DSC_TwoStage(micro=DSC_Sample(k=100, biased=TRUE), 
+    macro=DSC_Kmeans(k=2)), 
+  Window = DSC_TwoStage(micro=DSC_Window(horizon=100, lambda=.01), 
+    macro=DSC_Kmeans(k=2)),
+  
+  'D-Stream' = DSC_DStream(gridsize=.05, lambda=.01),
+  tNN = DSC_tNN(r=.02, lambda=.01),
+  DenStream = DSC_DenStream(epsilon=.05, lambda=.01),
+  CluStream = DSC_CluStream(m=100, k=2) 
+)
 @
 
 We perform the evaluation using \code{evaluate_cluster} which 
@@ -387,48 +292,17 @@ we have to specify a macro-clustering algorithm. We use $k$-means
 with the true number of clusters $k=2$.
 
 <<>>=  
-evaluation <- list()
 n <- 5000
 horizon <- 250
-reset_stream(dsd)
-evaluation[["D-Stream"]] <- evaluate_cluster(dstream, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
+reset_stream(stream)
 
-reset_stream(dsd)
-evaluation[["tNN"]] <- evaluate_cluster(tNN, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ","crand"), 
-  n=n, horizon=horizon)
-
-
-reset_stream(dsd)
-evaluation[["DenStream"]] <- evaluate_cluster(denstream, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
-
-reset_stream(dsd)
-evaluation[["CluStream"]] <- evaluate_cluster(clustream, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
-
-
-reset_stream(dsd)
-evaluation[["Sample"]] <- evaluate_cluster(sample, dsd, 
-  macro=DSC_Kmeans(k=2), 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
-
-reset_stream(dsd)
-evaluation[["Window"]] <- evaluate_cluster(window, dsd, 
-  macro=DSC_Kmeans(k=2), 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
+evaluation <- lapply(algorithms, FUN=function(a) {
+  reset_stream(stream)
+  evaluate_cluster(a, stream, 
+    type="macro", assign="micro",
+    measure=c("numMicro","numMacro","SSQ", "cRand"), 
+    n=n, horizon=horizon)
+})
 @
 
 %#animate_cluster(sample, dsd, macro=DSC_Kmeans(k=2), n=5000, horizon=500, type="both", evaluationMeasure="crand", evaluationAssignmentMethod="model", evaluationType="macro", assign=T, ylim=c(0,1))
@@ -454,6 +328,8 @@ And then we compare the sum of squares.
 SSQ <- sapply(evaluation, FUN=function(x) x[,"SSQ"])
 SSQ
 matplot(Position, SSQ, type="l", lwd=2)
+legend("topright", legend=names(evaluation), 
+  col=1:6, lty=1:6, bty="n", lwd=2)
 @
 % #barplot(colMeans(cRand), las=2)
 <<dynamic_box2, fig=TRUE, include=FALSE, width=4, height=4.1>>=

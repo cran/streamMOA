@@ -24,7 +24,7 @@ S3method(microToMacro, DSC_DenStream)
 ### so stream dispatches correcly
 S3method(get_microclusters, DSC_MOA)
 S3method(get_microweights, DSC_MOA)
-S3method(.cluster, DSC_MOA)
+S3method(update, DSC_MOA)
 
 S3method(get_macroclusters, DSC_DenStream)
 S3method(get_macroweights, DSC_DenStream)

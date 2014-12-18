@@ -32,7 +32,7 @@ DSC_DenStream <- function(epsilon,  mu=1, beta=0.2, lambda=0.001,
   
   ### note:DenStream does not use horizon anymore!
   horizon <- 1000
-  ### Java code does checking
+  ### Java code does parameter checking
   
   paramList <- list(
     h = horizon,
@@ -55,20 +55,21 @@ DSC_DenStream <- function(epsilon,  mu=1, beta=0.2, lambda=0.001,
   .jcall(options, "V", "setViaCLIString", cliParams)
   .jcall(clusterer, "V", "prepareForUse")
   
+  macro <- new.env()
+  macro$newdata <- FALSE
+  macro$macro <-DSC_Hierarchical(h=(offline+1e-9)*epsilon, method="single")
+  
   # initializing the R object
-  l <- list(
-    description = "DenStream",
-    options = cliParams,
-    javaObj = clusterer,
-    macro = new.env(),
-    eps = epsilon
-    )
-  
-  l$macro$newdata <- FALSE
-  l$macro$macro <-DSC_Hierarchical(h=(offline+1e-9)*epsilon, method="single") 
-  
-  class(l) <- c("DSC_DenStream","DSC_Micro","DSC_MOA","DSC")
-  l
+  structure(
+    list(
+      description = "DenStream",
+      options = cliParams,
+      javaObj = clusterer,
+      macro = macro,
+      eps = epsilon
+    ),
+    class = c("DSC_DenStream","DSC_Micro","DSC_MOA","DSC")
+  )
 }
 
 get_macroclusters.DSC_DenStream <- function(x, ...) {

@@ -52,23 +52,23 @@ Classification and Clustering. In Journal of Machine Learning Research
 }
 \examples{
 # 3 clusters with 5% noise
-dsd <- DSD_Gaussians(k=3, d=2, noise=0.05)
+stream <- DSD_Gaussians(k=3, d=2, noise=0.05)
 
-dsc <- DSC_DenStream(epsilon=.05)
-cluster(dsc, dsd, 500)
-dsc
+denstream <- DSC_DenStream(epsilon=.05)
+update(denstream, stream, 500)
+denstream
 
 # plot micro-clusters
-plot(dsc, dsd)
+plot(denstream, stream)
   
 # plot the micro-cluster assignment area
-plot(dsc, dsd, assignment=TRUE, weights=FALSE)
+plot(denstream, stream, assignment=TRUE, weights=FALSE)
 
 # show macro-clusters (using density reachability with epsilon x offline)
-plot(dsc, dsd, type="both")
+plot(denstream, stream, type="both")
 
 # reclustering. DenStream micro-clusters with k-means instead
 km <- DSC_Kmeans(k=3, weighted=TRUE)
-recluster(km, dsc)
-plot(km, dsd, type="both")
+recluster(km, denstream)
+plot(km, stream, type="both")
 }

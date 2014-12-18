@@ -16,16 +16,16 @@ set.seed(1000)
 ### code chunk number 3: data_bng
 ###################################################
 library("stream") 
-dsd <- DSD_Wrapper(DSD_BarsAndGaussians(noise=0.05), n=1500)
-dsd
-plot(dsd)
+stream <- DSD_Memory(DSD_BarsAndGaussians(noise=0.05), n=1500)
+stream
+plot(stream)
 
 
 ###################################################
 ### code chunk number 4: streamMOA.Rnw:57-61
 ###################################################
-sample <- DSC_Sample(k=100) 
-window <- DSC_Window(horizon=100)
+sample <- DSC_TwoStage(micro=DSC_Sample(k=100), macro=DSC_Kmeans(k=4)) 
+window <- DSC_TwoStage(micro=DSC_Window(horizon=100), macro=DSC_Kmeans(k=4))
 dstream <- DSC_DStream(gridsize=.7)
 tNN <- DSC_tNN(r=.5)
 
@@ -44,15 +44,15 @@ clustream <- DSC_CluStream(m=100, k=4)
 algorithms <- list(Sample=sample, Window=window, 'D-Stream'=dstream, tNN=tNN, 
   DenStream=denstream, CluStream=clustream)
 for(a in algorithms) {
-  reset_stream(dsd) 
-  cluster(a, dsd, 1000)
+  reset_stream(stream) 
+  update(a, stream, 1000)
 }
 
 
 ###################################################
 ### code chunk number 7: streamMOA.Rnw:86-87
 ###################################################
-sapply(algorithms, nclusters)
+sapply(algorithms, nclusters, type="micro")
 
 
 ###################################################
@@ -61,8 +61,8 @@ sapply(algorithms, nclusters)
 op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
-  reset_stream(dsd) 
-  plot(a, dsd, main=a$description)
+  reset_stream(stream) 
+  plot(a, stream, main=a$description, type="micro")
 }
 par(op)
 
@@ -73,8 +73,8 @@ par(op)
 op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
-  reset_stream(dsd) 
-  plot(a, dsd, main=a$description, assignment=TRUE, weight=FALSE)
+  reset_stream(stream) 
+  plot(a, stream, main=a$description, assignment=TRUE, weight=FALSE, type="micro")
 }
 par(op)
 
@@ -83,124 +83,85 @@ par(op)
 ### code chunk number 10: streamMOA.Rnw:169-175
 ###################################################
 sapply(algorithms, FUN=function(a) {
-  reset_stream(dsd, 1001) 
-  evaluate(a, dsd, 
+  reset_stream(stream, 1001) 
+  evaluate(a, stream, 
     measure=c("numMicroClusters", "purity", "SSQ", "silhouette"), 
-    n=500, assignmentMethod="auto")
+    n=500, assignmentMethod="auto", type="micro")
 })
 
 
 ###################################################
-### code chunk number 11: streamMOA.Rnw:198-205
-###################################################
-sample_km <- DSC_Kmeans(k=4, description="Sample + weighted k-means")
-recluster(sample_km, algorithms$Sample)
-algorithms$Sample <- sample_km 
-
-window_km <- DSC_Kmeans(k=4, description= "Window + weighted k-means")
-recluster(window_km, algorithms$Window)
-algorithms$Window <- window_km 
-
-
-###################################################
-### code chunk number 12: macroclusters
+### code chunk number 11: macroclusters
 ###################################################
 op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
-  reset_stream(dsd) 
-  plot(a, dsd, main=a$description, type="both")
+  reset_stream(stream) 
+  plot(a, stream, main=a$description, type="both")
 }
 par(op)
 
 
 ###################################################
-### code chunk number 13: streamMOA.Rnw:232-237
+### code chunk number 12: streamMOA.Rnw:223-228
 ###################################################
 sapply(algorithms, FUN=function(a) {
-  reset_stream(dsd, 1001) 
-  evaluate(a, dsd, measure=c("numMacroClusters","purity", "SSQ", "cRand"), 
+  reset_stream(stream, 1001) 
+  evaluate(a, stream, measure=c("numMacroClusters","purity", "SSQ", "cRand"), 
     n=500, assign="micro", type="macro")
 })
 
 
 ###################################################
-### code chunk number 14: streamMOA.Rnw:345-347
+### code chunk number 13: streamMOA.Rnw:246-248
 ###################################################
 set.seed(0)
-dsd <- DSD_Wrapper(DSD_Benchmark(1), 5000)
+stream <- DSD_Memory(DSD_Benchmark(1), 5000)
 
 
 ###################################################
-### code chunk number 15: moa1
+### code chunk number 14: moa1
 ###################################################
-plot(dsd, 250, xlim=c(0,1), ylim=c(0,1))
+plot(stream, 250, xlim=c(0,1), ylim=c(0,1))
 arrows(.15,.85,.85,.15, col=rgb(.8,.8,.8,.6), lwd=10)
 arrows(.15,.15,.85,.85, col=rgb(.8,.8,.8,.6), lwd=10)
-reset_stream(dsd)
+reset_stream(stream)
 
 
 ###################################################
-### code chunk number 16: streamMOA.Rnw:372-379
+### code chunk number 15: streamMOA.Rnw:273-284
 ###################################################
-sample <- DSC_Sample(k=100, biased=TRUE) 
-window <- DSC_Window(horizon=100, lambda=.01)
-
-dstream <- DSC_DStream(gridsize=.05, lambda=.01)
-tNN <- DSC_tNN(r=.02, lambda=.01)
-denstream <- DSC_DenStream(epsilon=.05, lambda=.01) 
-clustream <- DSC_CluStream(m=100, k=2) 
+algorithms <- list(
+  Sample = DSC_TwoStage(micro=DSC_Sample(k=100, biased=TRUE), 
+    macro=DSC_Kmeans(k=2)), 
+  Window = DSC_TwoStage(micro=DSC_Window(horizon=100, lambda=.01), 
+    macro=DSC_Kmeans(k=2)),
+  
+  'D-Stream' = DSC_DStream(gridsize=.05, lambda=.01),
+  tNN = DSC_tNN(r=.02, lambda=.01),
+  DenStream = DSC_DenStream(epsilon=.05, lambda=.01),
+  CluStream = DSC_CluStream(m=100, k=2) 
+)
 
 
 ###################################################
-### code chunk number 17: streamMOA.Rnw:389-431
+### code chunk number 16: streamMOA.Rnw:294-305
 ###################################################
-evaluation <- list()
 n <- 5000
 horizon <- 250
-reset_stream(dsd)
-evaluation[["D-Stream"]] <- evaluate_cluster(dstream, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
+reset_stream(stream)
 
-reset_stream(dsd)
-evaluation[["tNN"]] <- evaluate_cluster(tNN, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ","crand"), 
-  n=n, horizon=horizon)
-
-
-reset_stream(dsd)
-evaluation[["DenStream"]] <- evaluate_cluster(denstream, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
-
-reset_stream(dsd)
-evaluation[["CluStream"]] <- evaluate_cluster(clustream, dsd, 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
-
-
-reset_stream(dsd)
-evaluation[["Sample"]] <- evaluate_cluster(sample, dsd, 
-  macro=DSC_Kmeans(k=2), 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
-
-reset_stream(dsd)
-evaluation[["Window"]] <- evaluate_cluster(window, dsd, 
-  macro=DSC_Kmeans(k=2), 
-  type="macro", assign="micro",
-  measure=c("numMicro","numMacro","SSQ", "crand"), 
-  n=n, horizon=horizon)
+evaluation <- lapply(algorithms, FUN=function(a) {
+  reset_stream(stream)
+  evaluate_cluster(a, stream, 
+    type="macro", assign="micro",
+    measure=c("numMicro","numMacro","SSQ", "cRand"), 
+    n=n, horizon=horizon)
+})
 
 
 ###################################################
-### code chunk number 18: dynamic
+### code chunk number 17: dynamic
 ###################################################
 Position <- evaluation[[1]][,"points"]
 cRand <- sapply(evaluation, FUN=function(x) x[,"cRand"])
@@ -211,21 +172,23 @@ legend("bottomleft", legend=names(evaluation),
 
 
 ###################################################
-### code chunk number 19: dynamic_box
+### code chunk number 18: dynamic_box
 ###################################################
 boxplot(cRand, las=2)
 
 
 ###################################################
-### code chunk number 20: dynamic2
+### code chunk number 19: dynamic2
 ###################################################
 SSQ <- sapply(evaluation, FUN=function(x) x[,"SSQ"])
 SSQ
 matplot(Position, SSQ, type="l", lwd=2)
+legend("topright", legend=names(evaluation), 
+  col=1:6, lty=1:6, bty="n", lwd=2)
 
 
 ###################################################
-### code chunk number 21: dynamic_box2
+### code chunk number 20: dynamic_box2
 ###################################################
 boxplot(SSQ, las=2)
 

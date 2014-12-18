@@ -23,15 +23,12 @@ DSC_CluStream <- function(
   k=NULL
 ) {
   
-  if (horizon < 0)
-    stop("invalid horizon, must be > 0")
-  
-  if (m < 0)
-    stop("invalid m, must be > 0")
-  
-  paramList <- list(h = as.integer(horizon),
+  ### Java code does parameter checking
+  paramList <- list(
+    h = as.integer(horizon),
     m = as.integer(m),
-    t = t)
+    t = t
+    )
   
   # converting the param list to a cli string to use in java
   cliParams <- convert_params(paramList)
@@ -43,20 +40,20 @@ DSC_CluStream <- function(
   .jcall(options, "V", "setViaCLIString", cliParams)
   .jcall(clusterer, "V", "prepareForUse")
   
+  macro <- new.env()
+  macro$newdata <- FALSE
+  if(!is.null(k)) macro$macro <-DSC_Kmeans(k=k, weighted=TRUE, nstart=5) 
+  
   # initializing the R object
-  l <- list(
-    description = "CluStream",
-    options = cliParams,
-    javaObj = clusterer,
-    macro = new.env()
+  structure(
+    list(
+      description = "CluStream",
+      options = cliParams,
+      javaObj = clusterer,
+      macro = macro
+    ),
+    class = c("DSC_CluStream","DSC_Micro","DSC_MOA","DSC")
   )
-  
-  l$macro$newdata <- FALSE
-  if(!is.null(k)) l$macro$macro <-DSC_Kmeans(k=k, weighted=TRUE, nstart=5) 
-  
-  class(l) <- c("DSC_CluStream","DSC_Micro","DSC_MOA","DSC")
-  
-  l
 }
 
 
