@@ -35,17 +35,20 @@ get_points.DSD_MOA <- function(x, n=1,
 	for (i in 1:n) {
 		instance <- .jcall(x$javaObj, "Lweka/core/Instance;", "nextInstance")
 		row <- .jcall(instance, "[D", "toDoubleArray")
-		class <- .jcall(instance, "D", "classValue")
+		cl <- .jcall(instance, "D", "classValue")
 		data[i,] <- row[1:x$d]
-		a[i] <- class
+		a[i] <- cl
 	}
 
 	data <- data.frame(data)
-  a <- a + 1L
-  a[a>x$k] <- NA_integer_
+    a <- as.integer(a)
+    a[a==x$k] <- NA_integer_
+    a <- a + 1L
 	
   if(cluster) attr(data, "cluster") <- a
   if(class) data <- cbind(data, class = a)
 	
 	data
 }
+
+

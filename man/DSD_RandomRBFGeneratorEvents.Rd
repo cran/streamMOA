@@ -17,23 +17,22 @@ DSD_RandomRBFGeneratorEvents(k = 3, d = 2, numClusterRange = 3L,
 }
 
 \arguments{
-	\item{k}{The number of clusters.}
+	\item{k}{The average number of centroids in the model.}
 	\item{d}{The dimensionality of the data.}
-	\item{numClusterRange}{Number of clusters.}
+	\item{numClusterRange}{Range for numner of clusters.}
 	\item{kernelRadius}{The average radius of the micro-clusters.}
-	\item{kernelRadiusRange}{Radius range of the micro-clusters.}
+	\item{kernelRadiusRange}{Deviation of the number of centroids in the model.}
 	\item{densityRange}{Density range.}
-	\item{speed}{Speed.}
-	\item{speedRange}{Speed range.}
+	\item{speed}{Kernels move a predefined distance of 0.01 every X points.}
+	\item{speedRange}{Speed/Velocity point offset.}
 	\item{noiseLevel}{Noise level.}
-	\item{noiseInCluster}{Noise in cluster.}
+	\item{noiseInCluster}{Allow noise to be placed within a cluster.}
 	\item{eventFrequency}{Frequency of events.}
 	\item{eventMergeSplitOption}{Merge and split?}
 	\item{eventDeleteCreate}{Delete and create?}
 	\item{modelSeed}{Random seed for the model.}
 	\item{instanceSeed}{Random seed for the instances.}
 }
-
 \details{
 There are an assortment of parameters available for the underlying MOA data
 structure, however, we have currently limited the available parameters to

@@ -18,9 +18,11 @@
 
 # helpers
 
-.update_reclustering <- function(x) {
-  if(x$macro$newdata) {
-    recluster(x$macro$macro, x)
-    x$macro$newdata <- FALSE
-  }
+saveRDS_MOA <- function(object, file, ...) {
+  if(!is.null(object$javaObj)) .jcache(object$javaObj)
+  
+  ### for DSC_TwoStage
+  if(!is.null(object$micro$javaObj)) .jcache(object$micro$javaObj)
+  if(!is.null(object$macro$javaObj)) .jcache(object$macro$javaObj)
+  saveRDS(object, file=file, ...)
 }

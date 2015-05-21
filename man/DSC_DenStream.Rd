@@ -8,7 +8,7 @@ Class implements the DenStream cluster algorithm for data streams.
 }
 \usage{
 DSC_DenStream(epsilon, mu = 1, beta = 0.2, lambda = 0.001,
-    initPoints = 100, offline = 2, processingSpeed=1)
+    initPoints = 100, offline = 2, processingSpeed=1, recluster = TRUE)
 }
 
 \arguments{
@@ -23,6 +23,8 @@ DSC_DenStream(epsilon, mu = 1, beta = 0.2, lambda = 0.001,
   reachability reclustering }
   \item{processingSpeed}{Number of incoming points per time unit (important for decay). 
     Range: between 1 and 1000.}
+  \item{recluster}{logical; should the offline DBScan-based 
+    (i.e., single-link hierarchical clustering) be performed? }
 }
 
 \details{
@@ -32,7 +34,8 @@ DenStream applies weighted DBSCAN for reclustering (see Examples section below).
 }
 \value{
 An object of class \code{DSC_DenStream} (subclass of
-\code{DSC}, \code{DSC_MOA}, \code{DSC_Micro})
+\code{DSC}, \code{DSC_MOA}, \code{DSC_Micro}) or,
+  for \code{recluster=TRUE}, an object of class \code{DSC_TwoStage}.
 }
 
 \references{

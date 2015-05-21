@@ -9,14 +9,14 @@ options(width = 75, digits = 3, prompt = 'R> ')
 ###################################################
 ### code chunk number 2: streamMOA.Rnw:31-32
 ###################################################
-set.seed(1000) 
+set.seed(1234) 
 
 
 ###################################################
 ### code chunk number 3: data_bng
 ###################################################
 library("stream") 
-stream <- DSD_Memory(DSD_BarsAndGaussians(noise=0.05), n=1500)
+stream <- DSD_Memory(DSD_BarsAndGaussians(noise=0.05), n=5500)
 stream
 plot(stream)
 
@@ -27,7 +27,7 @@ plot(stream)
 sample <- DSC_TwoStage(micro=DSC_Sample(k=100), macro=DSC_Kmeans(k=4)) 
 window <- DSC_TwoStage(micro=DSC_Window(horizon=100), macro=DSC_Kmeans(k=4))
 dstream <- DSC_DStream(gridsize=.7)
-tNN <- DSC_tNN(r=.5)
+dbstream <- DSC_DBSTREAM(r=.5)
 
 
 ###################################################
@@ -41,11 +41,11 @@ clustream <- DSC_CluStream(m=100, k=4)
 ###################################################
 ### code chunk number 6: streamMOA.Rnw:76-82
 ###################################################
-algorithms <- list(Sample=sample, Window=window, 'D-Stream'=dstream, tNN=tNN, 
-  DenStream=denstream, CluStream=clustream)
+algorithms <- list(Sample=sample, Window=window, 'D-Stream'=dstream, 
+  DBSTREAM=dbstream, DenStream=denstream, CluStream=clustream)
 for(a in algorithms) {
   reset_stream(stream) 
-  update(a, stream, 1000)
+  update(a, stream, 5000)
 }
 
 
@@ -138,7 +138,7 @@ algorithms <- list(
     macro=DSC_Kmeans(k=2)),
   
   'D-Stream' = DSC_DStream(gridsize=.05, lambda=.01),
-  tNN = DSC_tNN(r=.02, lambda=.01),
+  DBSTREAM = DSC_DBSTREAM(r=.02, lambda=.01),
   DenStream = DSC_DenStream(epsilon=.05, lambda=.01),
   CluStream = DSC_CluStream(m=100, k=2) 
 )

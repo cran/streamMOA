@@ -32,7 +32,8 @@ Examples section below).
 
 \value{
 An object of class \code{DSC_CluStream} (subclass of 
-\code{DSC_Micro}, \code{DSC_MOA} and \code{DSC}). 
+\code{DSC_Micro}, \code{DSC_MOA} and \code{DSC}), or,
+  if \code{k} is not \code{NULL} then an object of \code{DSC_TwoStage}. 
 }
 
 \references{

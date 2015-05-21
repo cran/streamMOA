@@ -35,7 +35,8 @@ DSC_ClusTree <- function(horizon=1000, maxHeight=8, lambda=NULL) {
   cliParams <- convert_params(paramList)
   
   # initializing the clusterer
-  clusterer <- .jnew("moa/clusterers/clustree/ClusTree")
+  clusterer <- .jcast(.jnew("moa/clusterers/clustree/ClusTree"),
+    "moa/clusterers/AbstractClusterer")
   options <- .jcall(clusterer, "Lmoa/options/Options;", "getOptions")
   .jcall(options, "V", "setViaCLIString", cliParams)
   .jcall(clusterer, "V", "prepareForUse")

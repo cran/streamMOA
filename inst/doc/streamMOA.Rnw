@@ -29,12 +29,12 @@ We will use the first
 evaluation. 
 
 <<echo=FALSE>>=
-set.seed(1000) 
+set.seed(1234) 
 @
 
 <<data_bng, fig=TRUE, include=FALSE>>= 
 library("stream") 
-stream <- DSD_Memory(DSD_BarsAndGaussians(noise=0.05), n=1500)
+stream <- DSD_Memory(DSD_BarsAndGaussians(noise=0.05), n=5500)
 stream
 plot(stream)
 @
@@ -58,7 +58,7 @@ experimentally so that the algorithm produce each (approximately) 100 micro-clus
 sample <- DSC_TwoStage(micro=DSC_Sample(k=100), macro=DSC_Kmeans(k=4)) 
 window <- DSC_TwoStage(micro=DSC_Window(horizon=100), macro=DSC_Kmeans(k=4))
 dstream <- DSC_DStream(gridsize=.7)
-tNN <- DSC_tNN(r=.5)
+dbstream <- DSC_DBSTREAM(r=.5)
 @
 
 We will also use two MOA-based algorithms available in package~\pkg{streamMOA}.
@@ -74,11 +74,11 @@ We store the algorithms in a list for easier handling and then cluster the same
 each time before we cluster.
 
 <<>>=
-algorithms <- list(Sample=sample, Window=window, 'D-Stream'=dstream, tNN=tNN, 
-  DenStream=denstream, CluStream=clustream)
+algorithms <- list(Sample=sample, Window=window, 'D-Stream'=dstream, 
+  DBSTREAM=dbstream, DenStream=denstream, CluStream=clustream)
 for(a in algorithms) {
   reset_stream(stream) 
-  update(a, stream, 1000)
+  update(a, stream, 5000)
 }
 @
 
@@ -119,9 +119,9 @@ Reservoir sampling and the sliding window randomly place the micro-clusters
 and also a few noise points (shown as grey dots). 
 Clustream also does not suppress noise and
 places even more micro-clusters on noise points since it tries to
-represent all data as faithfully as possible. D-Stream, DenStream and tNN all
+represent all data as faithfully as possible. D-Stream, DenStream and DBSTREAM all
 suppress noise and concentrate the micro-clusters on the real clusters. D-Stream
-is grid-based and thus the micro-clusters are regularly spaced. tNN 
+is grid-based and thus the micro-clusters are regularly spaced. DBSTREAM 
 produces a similar, almost regular pattern. DenStream
 produces one heavy micro-cluster on one cluster, while using a large number of
 micro clusters for the others. It also has problems with detecting the 
@@ -157,7 +157,7 @@ Figure~\ref{figure:microclusters_assignment} shows the assignment areas as dotte
 circles around micro-clusters. Reservoir sampling and sliding window does
 not provide assignment areas and data points are always assigned to
 the nearest micro-cluster. D-Stream is grid-based
-and shows the assignment area as grey boxes. tNN uses the same 
+and shows the assignment area as grey boxes. DBSTREAM uses the same 
 radius for all micro-clusters, while DenStream and CluStream calculate 
 the assignment area for each micro-cluster.
 
@@ -183,13 +183,13 @@ We can compare the measures, of the other algorithms since the number
 of micro-clusters is close.
 Sampling and the sliding window produce very good values 
 for purity, CluStream achieves the highest average 
-silhouette coefficient and tNN produces the lowest sum of squares.
+silhouette coefficient and DBSTREAM produces the lowest sum of squares.
 For better results more data and cross-validation could be used. 
 
-Next, we compare macro-clusters. D-Stream, DenStream, tNN and CluStream
+Next, we compare macro-clusters. D-Stream, DenStream, DBSTREAM and CluStream
 have built-in reclustering strategies. 
 D-Stream joins adjacent dense grid cells for form macro-clusters.
-DenStream and tNN use the reachability concept (from DBSCAN).
+DenStream and DBSTREAM use the reachability concept (from DBSCAN).
 CluStream used weighted $k$-means clustering (note that we used 
 $k=4$ when we initialized \code{DSC_DenStream} above).
 For sampling and window we apply here weighted
@@ -217,7 +217,7 @@ Figure~\ref{figure:macroclusters} shows the macro-cluster placement. Sample, win
 CluStream use $k$-means reclustering and therefore produce exactly four clusters.
 However, the placement is off, splitting a true cluster and missing one of the less
 dense clusters. 
-DenStream, tNN and D-Stream identify the two denser clusters
+DenStream, DBSTREAM and D-Stream identify the two denser clusters
 correctly, but split the lower density clusters into multiple pieces.
 
 <<>>=
@@ -278,7 +278,7 @@ algorithms <- list(
     macro=DSC_Kmeans(k=2)),
   
   'D-Stream' = DSC_DStream(gridsize=.05, lambda=.01),
-  tNN = DSC_tNN(r=.02, lambda=.01),
+  DBSTREAM = DSC_DBSTREAM(r=.02, lambda=.01),
   DenStream = DSC_DenStream(epsilon=.05, lambda=.01),
   CluStream = DSC_CluStream(m=100, k=2) 
 )
@@ -361,6 +361,6 @@ Figure~\ref{figure:data_bng} shows how the different clustering algorithms compa
 in terms of the corrected Rand index and the sum of squares. For all
 algorithms the performance degrades around position 3000 since both clusters 
 overlap completely at that point in the stream. The box-plots to the right
-indicate that D-Stream and tNN perform overall better than the other algorithms.
+indicate that D-Stream and DBSTREAM perform overall better than the other algorithms.
 
 \input{foot.tex}

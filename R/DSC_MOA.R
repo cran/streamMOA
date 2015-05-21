@@ -1,4 +1,3 @@
-
 #######################################################################
 # stream -  Infrastructure for Data Stream Mining
 # Copyright (C) 2013 Michael Hahsler, Matthew Bolanos, John Forrest 
@@ -43,31 +42,40 @@ convert_params <- function(paramList=list()) {
 
 ### update
 update.DSC_MOA <- function(object, dsd, n, verbose=FALSE, ...) {
+  if(is.jnull(object$javaObj)) stop("Java Object is not available.", 
+    call. = FALSE)
+  
   if(n>=1) {
     
     if(!is(dsd, "DSD_data.frame"))
       stop("Cannot cluster stream (need a DSD_data.frame.)")
     
-    
     ## data has to be all doubles for MOA clusterers!
-    for (i in 1:n) {
-      
-      d <- get_points(dsd, 1)
-      ## TODO: Check incoming data
-      
-      x <- .jcast(
-        .jnew("weka/core/DenseInstance", 1.0, .jarray(as.double(d))),
-        "weka/core/Instance"
-      )
-      
-      .jcall(object$javaObj, "V", "trainOnInstanceImpl", x)
-      
-      if(verbose && !i%%1000) cat("Processed", i, "points -",
-        nclusters(object), "clusters\n")
-      
-    }	
+#     for (i in 1:n) {
+#       
+#       d <- get_points(dsd, 1)
+#       ## TODO: Check incoming data
+#       
+#       x <- .jcast(
+#         .jnew("weka/core/DenseInstance", 1.0, .jarray(as.double(d))),
+#         "weka/core/Instance"
+#       )
+#       
+#       .jcall(object$javaObj, "V", "trainOnInstanceImpl", x)
+#       
+#       if(verbose && !i%%1000) cat("Processed", i, "points -",
+#         nclusters(object), "clusters\n")
+#       
+#     }	
+
+    d <- get_points(dsd, n)
+    .jcall("StreamMOA", "V", "update", object$javaObj, 
+      .jarray(as.matrix(d), dispatch = TRUE))
     
-  }
+   }
+    
+   
+    
   # so cl <- cluster(cl, ...) also works
   invisible(object)
 }
@@ -75,11 +83,12 @@ update.DSC_MOA <- function(object, dsd, n, verbose=FALSE, ...) {
 
 ### accessors
 get_microclusters.DSC_MOA <- function(x, ...) {   
-  if (!.jcall(x$javaObj, "Z", "implementsMicroClusterer")) 
-    stop("Micro-clusters not supported.")
-  
-  .get_centers_MOA(.jcall(x$javaObj, 
-    "Lmoa/cluster/Clustering;", "getMicroClusteringResult"))
+  if(.jcall(x$javaObj, "Z", "implementsMicroClusterer")) 
+    .get_centers_MOA(.jcall(x$javaObj, 
+      "Lmoa/cluster/Clustering;", "getMicroClusteringResult"))
+  else 
+    .get_centers_MOA(.jcall(x$javaObj, 
+      "Lmoa/cluster/Clustering;", "getClusteringResult"))
 }  
 
 #get_macroclusters.DSC_MOA <- function(x, ...) {   
@@ -128,11 +137,13 @@ get_microclusters.DSC_MOA <- function(x, ...) {
 }
 
 get_microweights.DSC_MOA <- function(x, ...) {   
-  if (!.jcall(x$javaObj, "Z", "implementsMicroClusterer")) 
-    stop("Micro-clusters not supported.")
+  if (.jcall(x$javaObj, "Z", "implementsMicroClusterer")) 
+    .get_weights_MOA(.jcall(x$javaObj, 
+      "Lmoa/cluster/Clustering;", "getMicroClusteringResult"))
+  else
+    .get_weights_MOA(.jcall(x$javaObj, 
+      "Lmoa/cluster/Clustering;", "getClusteringResult"))
   
-  .get_weights_MOA(.jcall(x$javaObj, 
-    "Lmoa/cluster/Clustering;", "getMicroClusteringResult"))
 }  
 
 #get_macroweights.DSC_MOA <- function(x, ...) {   
@@ -255,7 +266,11 @@ plot.DSC_MOA <- function(x, dsd = NULL, n = 500,
       }
     }
   }
-  
-  
-  
 }
+
+# check for NULL reference
+print.DSC_MOA <- function(x, ...) {
+  if(is.jnull(x$javaObj)) stop("Java Object is not available.", call. = FALSE)
+  NextMethod()
+}
+

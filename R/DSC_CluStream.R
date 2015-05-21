@@ -35,46 +35,25 @@ DSC_CluStream <- function(
   
   # initializing the clusterer
 #  clusterer <- .jnew("moa/clusterers/clustream/Clustream")
-  clusterer <- .jnew("moa/clusterers/clustream/WithKmeans")
+  clusterer <- .jcast(.jnew("moa/clusterers/clustream/WithKmeans"),
+    "moa/clusterers/AbstractClusterer")
   options <- .jcall(clusterer, "Lmoa/options/Options;", "getOptions")
   .jcall(options, "V", "setViaCLIString", cliParams)
   .jcall(clusterer, "V", "prepareForUse")
   
-  macro <- new.env()
-  macro$newdata <- FALSE
-  if(!is.null(k)) macro$macro <-DSC_Kmeans(k=k, weighted=TRUE, nstart=5) 
   
   # initializing the R object
-  structure(
+  clus <- structure(
     list(
       description = "CluStream",
       options = cliParams,
-      javaObj = clusterer,
-      macro = macro
+      javaObj = clusterer
     ),
     class = c("DSC_CluStream","DSC_Micro","DSC_MOA","DSC")
   )
-}
 
-
-
-get_macroclusters.DSC_CluStream <- function(x, ...) {
-  if(is.null(x$macro$macro)) stop("No k_macro set!")
-  .update_reclustering(x)
- 
-  get_centers(x$macro$macro, type="macro")
-}
-
-get_macroweights.DSC_CluStream <- function(x, ...) {
-  if(is.null(x$macro$macro)) stop("No k_macro set!")
-  .update_reclustering(x)
+  if(!is.null(k)) clus <- DSC_TwoStage(clus, 
+    DSC_Kmeans(k=k, weighted=TRUE, nstart=5)) 
   
-  get_weights(x$macro$macro, type="macro")
-}
-
-microToMacro.DSC_CluStream <- function(x, micro=NULL) {
-  if(is.null(x$macro$macro)) stop("No k set!")
-  .update_reclustering(x)
-  
-  microToMacro(x$macro$macro, micro)  
+  clus
 }
