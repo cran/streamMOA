@@ -8,23 +8,27 @@ Class implements the DenStream cluster algorithm for data streams.
 }
 \usage{
 DSC_DenStream(epsilon, mu = 1, beta = 0.2, lambda = 0.001,
-    initPoints = 100, offline = 2, processingSpeed=1, recluster = TRUE)
+    initPoints = 100, offline = 2, processingSpeed=1, recluster = TRUE, k=NULL)
 }
 
 \arguments{
   \item{epsilon}{defines the epsilon neighbourhood which is the 
     maximal radius of micro-clusters (r<=epsilon). Range: 0 to 1.}
-  \item{mu}{minimum weight w for core-micro-clusters (w>=mu). Range: 0 to max(double).}
+  \item{mu}{minpoints as the weight w a core-micro-clusters needs to be created 
+    (w>=mu). Range: 0 to max(int).}
   \item{beta}{multiplier for mu to detect outlier micro-clusters given their 
     weight w (w<beta x mu). Range: 0 to 1} 
   \item{lambda}{decay constant.}
   \item{initPoints}{number of points to use for initialization via DBSCAN.}
   \item{offline}{offline multiplier for epsilon. Range: between 2 and 20). Used for
-  reachability reclustering }
-  \item{processingSpeed}{Number of incoming points per time unit (important for decay). 
+    reachability reclustering }
+  \item{processingSpeed}{Number of incoming points per time unit 
+    (important for decay). 
     Range: between 1 and 1000.}
-  \item{recluster}{logical; should the offline DBScan-based 
-    (i.e., single-link hierarchical clustering) be performed? }
+  \item{recluster}{logical; should the offline DBSCAN-based 
+    (i.e., reachability at a distance of epsilon) be performed? }
+  \item{k}{integer; tries to automatically chooses offline to find 
+    k macro-clusters.} 
 }
 
 \details{

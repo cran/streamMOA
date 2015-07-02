@@ -20,14 +20,14 @@
 # denstream options:
 # -e epsilon 	0.01 (defines the epsilon neighborhood, range: 0 to 1)
 # -p minPoints 	10 (min. num. points a cluster must have)
-# -b beta	0.001 (range: 0 to 1)
-# -m mu		1 (range: 0 to max(double))
+# depricated -b beta	0.001 (range: 0 to 1)
+# -m mu		1 (range: 0 to max(double)) -> this is actually minpoints and will get converted to int!
 # -l lambda (range: 0 to 1)
 # -i initPoints	10000 (number of points to use for initialization)
 
 
 DSC_DenStream <- function(epsilon,  mu=1, beta=0.2, lambda=0.001,
-  initPoints=100, offline=2, processingSpeed=1, recluster=TRUE) {
+  initPoints=100, offline=2, processingSpeed=1, recluster=TRUE, k = NULL) {
   #, minPoints=10) {
   
   ### note:DenStream does not use horizon anymore!
@@ -42,7 +42,8 @@ DSC_DenStream <- function(epsilon,  mu=1, beta=0.2, lambda=0.001,
     m = mu,
     i = initPoints,
     l = lambda,
-    o = offline,
+#    o = offline,
+    o = 2.0,
     s = processingSpeed
     )
   
@@ -67,9 +68,13 @@ DSC_DenStream <- function(epsilon,  mu=1, beta=0.2, lambda=0.001,
     ),
     class = c("DSC_DenStream","DSC_Micro","DSC_MOA","DSC")
   )
-
-  if(recluster) clus <- DSC_TwoStage(clus, 
-    DSC_Hierarchical(h=(offline+1e-9)*epsilon, method="single"))
-
+  
+  if(recluster) {
+    if(!is.null(k)) clus <- DSC_TwoStage(clus, 
+      DSC_Hierarchical(k=k, method="single"))
+    else clus <- DSC_TwoStage(clus, 
+      DSC_Hierarchical(h=(offline+1e-9)*epsilon, method="single"))
+  }
+  
   clus
 }
