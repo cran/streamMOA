@@ -62,7 +62,7 @@ op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
   reset_stream(stream) 
-  plot(a, stream, main=a$description, type="micro")
+  plot(a, stream, main=description(a), type="micro")
 }
 par(op)
 
@@ -74,7 +74,7 @@ op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
   reset_stream(stream) 
-  plot(a, stream, main=a$description, assignment=TRUE, weight=FALSE, type="micro")
+  plot(a, stream, main=description(a), assignment=TRUE, weight=FALSE, type="micro")
 }
 par(op)
 
@@ -97,7 +97,7 @@ op <- par(no.readonly = TRUE)
 layout(mat=matrix(1:6, ncol=2))
 for(a in algorithms) {
   reset_stream(stream) 
-  plot(a, stream, main=a$description, type="both")
+  plot(a, stream, main=description(a), type="both")
 }
 par(op)
 

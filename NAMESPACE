@@ -10,9 +10,7 @@ export(
   DSC_CluStream,
   DSC_ClusTree,
 	
-  DSD_RandomRBFGeneratorEvents,
-  
-  saveRDS_MOA
+  DSD_RandomRBFGeneratorEvents
 )
 
 ### S3 Methods

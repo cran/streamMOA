@@ -1,3 +1,6 @@
+Release version 1.1-2 (09/06/15)
+    * Interface changes for stream release version 1.2-0.
+
 Release version 1.1-1 (07/02/15)
     * Fixed NAMESPACE imports.
     * Downgraded to Java version 1.5 (from 1.7)
