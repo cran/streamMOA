@@ -24,3 +24,8 @@ Hardy Kremer, Timm Jansen, Thomas Seidl.  Journal of Machine Learning Research
 \seealso{
 	\code{\link{DSC}}
 }
+
+\author{
+    Michael Hahsler and John Forrest
+}
+

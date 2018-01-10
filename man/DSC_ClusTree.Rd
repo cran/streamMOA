@@ -42,8 +42,13 @@ Stream Classification and Clustering. In Journal of Machine
 	\code{\link{DSC_Micro}},
 	\code{\link{DSC_MOA}}
 }
+
+\author{
+    Michael Hahsler and John Forrest
+}
+
 \examples{
-# 3 clusters with 5% noise
+# data with 3 clusters and 5% noise
 stream <- DSD_Gaussians(k=3, d=2, noise=0.05)
 
 clustree <- DSC_ClusTree(maxHeight=3)
@@ -58,9 +63,9 @@ kmeans <- DSC_Kmeans(k=3)
 recluster(kmeans, clustree)
 plot(kmeans, stream, type="both")
 
-# create a two stage clusering using ClusTree and reachability reclustering 
+# create a two stage clusering using ClusTree and reachability reclustering
 CTxReach <- DSC_TwoStage(
-  micro=DSC_ClusTree(maxHeight=3), 
+  micro=DSC_ClusTree(maxHeight=3),
   macro=DSC_Reachability(epsilon = .15)
 )
 CTxReach

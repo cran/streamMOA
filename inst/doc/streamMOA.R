@@ -27,7 +27,7 @@ plot(stream)
 sample <- DSC_TwoStage(micro=DSC_Sample(k=100), macro=DSC_Kmeans(k=4)) 
 window <- DSC_TwoStage(micro=DSC_Window(horizon=100), macro=DSC_Kmeans(k=4))
 dstream <- DSC_DStream(gridsize=.7)
-dbstream <- DSC_DBSTREAM(r=.5)
+dbstream <- DSC_DBSTREAM(r=.45)
 
 
 ###################################################
@@ -132,15 +132,15 @@ reset_stream(stream)
 ### code chunk number 15: streamMOA.Rnw:273-284
 ###################################################
 algorithms <- list(
-  Sample = DSC_TwoStage(micro=DSC_Sample(k=100, biased=TRUE), 
+  'Sample' = DSC_TwoStage(micro=DSC_Sample(k=100, biased=TRUE), 
     macro=DSC_Kmeans(k=2)), 
-  Window = DSC_TwoStage(micro=DSC_Window(horizon=100, lambda=.01), 
+  'Window' = DSC_TwoStage(micro=DSC_Window(horizon=100, lambda=.01), 
     macro=DSC_Kmeans(k=2)),
   
-  'D-Stream' = DSC_DStream(gridsize=.05, lambda=.01),
-  DBSTREAM = DSC_DBSTREAM(r=.02, lambda=.01),
-  DenStream = DSC_DenStream(epsilon=.05, lambda=.01),
-  CluStream = DSC_CluStream(m=100, k=2) 
+  'D-Stream' = DSC_DStream(gridsize=.1, lambda=.01),
+  'DBSTREAM' = DSC_DBSTREAM(r=.05, lambda=.01),
+  'DenStream' = DSC_DenStream(epsilon=.1, lambda=.01),
+  'CluStream' = DSC_CluStream(m=100, k=2) 
 )
 
 
@@ -155,7 +155,7 @@ evaluation <- lapply(algorithms, FUN=function(a) {
   reset_stream(stream)
   evaluate_cluster(a, stream, 
     type="macro", assign="micro",
-    measure=c("numMicro","numMacro","SSQ", "cRand"), 
+    measure=c("numMicro","numMacro","SSQ", "cRand"),  
     n=n, horizon=horizon)
 })
 
@@ -174,7 +174,7 @@ legend("bottomleft", legend=names(evaluation),
 ###################################################
 ### code chunk number 18: dynamic_box
 ###################################################
-boxplot(cRand, las=2)
+boxplot(cRand, las=2, cex.axis=.8)
 
 
 ###################################################
@@ -190,6 +190,6 @@ legend("topright", legend=names(evaluation),
 ###################################################
 ### code chunk number 20: dynamic_box2
 ###################################################
-boxplot(SSQ, las=2)
+boxplot(SSQ, las=2, cex.axis=.8)
 
 

@@ -60,6 +60,12 @@ Research (JMLR).
 \seealso{
 	\code{\link{DSD}}
 }
+
+\author{
+    Michael Hahsler and John Forrest
+}
+
+
 \examples{
 stream <- DSD_RandomRBFGeneratorEvents()
 get_points(stream, 10, class=TRUE)
