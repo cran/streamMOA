@@ -1,3 +1,7 @@
+# Changes in version 1.1-4 (04/06/18)
+
+*  Fixed Java runtime version test for version 10 and beyond.
+
 # Changes in version 1.1-3 (01/07/18)
 
 *  Improved documentation for DenStream.

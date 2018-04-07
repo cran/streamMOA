@@ -1,6 +1,6 @@
 Package: streamMOA
-Version: 1.1-3
-Date: 2018-01-07
+Version: 1.1-4
+Date: 2018-04-06
 Title: Interface for MOA Stream Clustering Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
 	    email = "mhahsler@lyle.smu.edu"),
@@ -17,10 +17,10 @@ Copyright: MOA code in inst/java/moa.jar is Copyright (C) The
         version 2.0. All other code is Copyright (C) Matthew Bolanos,
         John Forrest and Michael Hahsler
 NeedsCompilation: no
-Packaged: 2018-01-09 18:09:52 UTC; hahsler
+Packaged: 2018-04-07 03:43:41 UTC; hahsler
 Author: Michael Hahsler [aut, cre, cph],
   Matthew Bolanos [aut, cph],
   John Forrest [aut, cph]
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
 Repository: CRAN
-Date/Publication: 2018-01-10 23:56:39 UTC
+Date/Publication: 2018-04-07 04:18:01 UTC
