@@ -1,12 +1,13 @@
 Package: streamMOA
-Version: 1.1-4
-Date: 2018-04-06
+Version: 1.2-0
+Date: 2019-03-14
 Title: Interface for MOA Stream Clustering Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
 	    email = "mhahsler@lyle.smu.edu"),
-	person("Matthew", "Bolanos", role = c("aut", "cph")),
-	person("John", "Forrest", role = c("aut", "cph")))
-Description: Interface for data stream clustering algorithms implemented in the MOA (Massive Online Analysis) framework.
+	person("John", "Forrest", role = c("aut", "cph")),
+	person("Matthew", "Bolanos", role = c("ctb")),
+	person("Matthias", "Carnein", role = c("ctb")))
+Description: Interface for data stream clustering algorithms implemented in the MOA (Massive Online Analysis) framework (Albert Bifet, Geoff Holmes, Richard Kirkby, Bernhard Pfahringer (2010). MOA: Massive Online Analysis, Journal of Machine Learning Research 11: 1601-1604).
 Depends: stream (>= 1.1-2), rJava (>= 0.6-3)
 Imports: graphics, stats, methods
 SystemRequirements: Java (>= 5.0)
@@ -17,10 +18,11 @@ Copyright: MOA code in inst/java/moa.jar is Copyright (C) The
         version 2.0. All other code is Copyright (C) Matthew Bolanos,
         John Forrest and Michael Hahsler
 NeedsCompilation: no
-Packaged: 2018-04-07 03:43:41 UTC; hahsler
+Packaged: 2019-03-14 15:06:21 UTC; hahsler
 Author: Michael Hahsler [aut, cre, cph],
-  Matthew Bolanos [aut, cph],
-  John Forrest [aut, cph]
+  John Forrest [aut, cph],
+  Matthew Bolanos [ctb],
+  Matthias Carnein [ctb]
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
 Repository: CRAN
-Date/Publication: 2018-04-07 04:18:01 UTC
+Date/Publication: 2019-03-14 16:40:03 UTC
