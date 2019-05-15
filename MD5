@@ -1,6 +1,6 @@
-358884522154ca3156d1f8018e0e71fd *DESCRIPTION
+e5ecaaf884ea6c21f204f89371706648 *DESCRIPTION
 4b5d7d6f5cf15ba267e7c3243bd02d1a *NAMESPACE
-0f02e0debc2f496e5ccf73bf305e45d7 *NEWS.md
+9a706751fdbfa46788b2d1ce8ebe9428 *NEWS.md
 c859e24d32ed499fcbc3616ff3edd34a *R/DSC_BICO_MOA.R
 312e05ddbf466fa7e2b663a6d136bd16 *R/DSC_CluStream.R
 7db3f9ee3dc93d4c5cb9a078b2112093 *R/DSC_ClusTree.R
@@ -13,13 +13,13 @@ b873c39a10d1c76462b44b936a6067e1 *R/DSC_streamkm.R
 463b487645fb1f41e3122423e9b8921b *R/ellipse.R
 61d303cfe23ca1e71baf239c0691f9a6 *R/onLoad.R
 a946fa9747faa076dba9fc52fb231d2a *README.md
-7b3582cb9e140eb7804ea45bc9e5b29c *build/vignette.rds
+b786741a1408cc55e60837eb254b7b3f *build/vignette.rds
 80d360bbedd87664b707f7562ddfd2dc *inst/doc/streamMOA.R
 a2a0b36827dedb5420d235d7a98c0601 *inst/doc/streamMOA.Rnw
-ec0a7f6953a0fdf67d944493a8ef71d9 *inst/doc/streamMOA.pdf
-dcdd95ed6fb95960fddd323f439bb3eb *inst/java/StreamMOA.jar
-ce0a1bd477d884ed05a9cf24091288f5 *inst/java/moa.jar
-feb182e2539300ee543ac8fb7e4adbc1 *java/Makefile
+21d08b63e136a3f3b0d77dfadd6fbf0e *inst/doc/streamMOA.pdf
+213177ed6a7e0c3b0274c00b9d2b36bb *inst/java/StreamMOA.jar
+c28c28ea2efdafefa22ad36e2c947e9d *inst/java/moa.jar
+4910334539f854cd8875e34743e3e19d *java/Makefile
 9298616f9c569714bff8959891a3d3af *java/README
 a30f5f407aa2a2a508fc8f4812de6c04 *java/StreamMOA.java
 ceaef6b59e34af8b61d5188192d0a616 *man/DSC_BICO_MOA.Rd
