@@ -193,3 +193,61 @@ legend("topright", legend=names(evaluation),
 boxplot(SSQ, las=2, cex.axis=.8)
 
 
+###################################################
+### code chunk number 21: outlier1
+###################################################
+library(stream)
+set.seed(1000)
+stream <- DSD_Gaussians(k = 3, d = 2, outliers = 10,
+            separation_type = "Mahalanobis", separation = 4,
+            space_limit = c(0, 30), variance_limit = 0.8,
+            outlier_options = list(outlier_horizon = 1000))
+
+
+###################################################
+### code chunk number 22: outlier2
+###################################################
+plot(stream, n=1000)
+
+
+###################################################
+### code chunk number 23: outlier3
+###################################################
+reset_stream(stream)
+mic_c <- DSC_MCOD(r = 2.5, w = 1000)
+evaluate(mic_c, stream, n = 1000, type = "micro",
+         measure = c("crand","outlierjaccard"))
+
+
+###################################################
+### code chunk number 24: outlier4
+###################################################
+reset_stream(stream)
+plot(mic_c, stream, n=1000, type="micro")
+
+
+###################################################
+### code chunk number 25: outlier5
+###################################################
+reset_stream(stream)
+plot(mic_c, stream, n=1000, type="outlier")
+
+
+###################################################
+### code chunk number 26: outlier6
+###################################################
+reset_stream(stream)
+mic_c <- DSC_MCOD(r = 1.5, w = 1000, t = 10)
+mac_c <- DSC_Kmeans(3)
+tp_c <- DSC_TwoStage(mic_c, mac_c)
+evaluate(tp_c, stream, n = 1000, type = "macro",
+         measure = c("crand","outlierjaccard"))
+
+
+###################################################
+### code chunk number 27: outlier7
+###################################################
+reset_stream(stream)
+plot(tp_c, stream, n=1000, type="all")
+
+
