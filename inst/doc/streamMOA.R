@@ -34,8 +34,8 @@ dbstream <- DSC_DBSTREAM(r=.45)
 ### code chunk number 5: streamMOA.Rnw:66-69
 ###################################################
 library("streamMOA")
-denstream <- DSC_DenStream_MOA(epsilon=.5, mu=1)
-clustream <- DSC_CluStream_MOA(m=100, k=4)
+denstream <- DSC_DenStream(epsilon=.5, mu=1)
+clustream <- DSC_CluStream(m=100, k=4)
 
 
 ###################################################
@@ -136,20 +136,19 @@ algorithms <- list(
     macro=DSC_Kmeans(k=2)),
   'Window' = DSC_TwoStage(micro=DSC_Window(horizon=100, lambda=.01),
     macro=DSC_Kmeans(k=2)),
-
-  'D-Stream' = DSC_DStream(gridsize=.1, lambda=.01),
   'DBSTREAM' = DSC_DBSTREAM(r=.05, lambda=.01),
-  'DenStream' = DSC_DenStream_MOA(epsilon=.1, lambda=.01),
-  'CluStream' = DSC_CluStream_MOA(m=100, k=2)
+  'D-Stream' = DSC_DStream(gridsize=.1, lambda=.01),
+
+  'DenStream' = DSC_DenStream(epsilon=.1, lambda=.01),
+  'CluStream' = DSC_CluStream(m=100, k=2)
 )
 
 
 ###################################################
-### code chunk number 16: streamMOA.Rnw:294-305
+### code chunk number 16: streamMOA.Rnw:294-304
 ###################################################
 n <- 5000
 horizon <- 250
-reset_stream(stream)
 
 evaluation <- lapply(algorithms, FUN=function(a) {
   reset_stream(stream)
@@ -214,7 +213,7 @@ plot(stream, n=1000)
 ### code chunk number 23: outlier3
 ###################################################
 reset_stream(stream)
-mic_c <- DSC_MCOD(r = 2.5, w = 1000)
+mic_c <- DSOutlier_MCOD(r = 2.5, w = 1000)
 evaluate(mic_c, stream, n = 1000, type = "micro",
          measure = c("crand","outlierjaccard"))
 
@@ -237,7 +236,7 @@ plot(mic_c, stream, n=1000, type="outlier")
 ### code chunk number 26: outlier6
 ###################################################
 reset_stream(stream)
-mic_c <- DSC_MCOD(r = 1.5, w = 1000, t = 10)
+mic_c <- DSOutlier_MCOD(r = 1.5, w = 1000, t = 10)
 mac_c <- DSC_Kmeans(3)
 tp_c <- DSC_TwoStage(mic_c, mac_c)
 evaluate(tp_c, stream, n = 1000, type = "macro",

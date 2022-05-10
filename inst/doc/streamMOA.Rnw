@@ -65,8 +65,8 @@ We will also use two MOA-based algorithms available in package~\pkg{streamMOA}.
 
 <<>>=
 library("streamMOA")
-denstream <- DSC_DenStream_MOA(epsilon=.5, mu=1)
-clustream <- DSC_CluStream_MOA(m=100, k=4)
+denstream <- DSC_DenStream(epsilon=.5, mu=1)
+clustream <- DSC_CluStream(m=100, k=4)
 @
 
 We store the algorithms in a list for easier handling and then cluster the same
@@ -276,11 +276,11 @@ algorithms <- list(
     macro=DSC_Kmeans(k=2)),
   'Window' = DSC_TwoStage(micro=DSC_Window(horizon=100, lambda=.01),
     macro=DSC_Kmeans(k=2)),
-
-  'D-Stream' = DSC_DStream(gridsize=.1, lambda=.01),
   'DBSTREAM' = DSC_DBSTREAM(r=.05, lambda=.01),
-  'DenStream' = DSC_DenStream_MOA(epsilon=.1, lambda=.01),
-  'CluStream' = DSC_CluStream_MOA(m=100, k=2)
+  'D-Stream' = DSC_DStream(gridsize=.1, lambda=.01),
+
+  'DenStream' = DSC_DenStream(epsilon=.1, lambda=.01),
+  'CluStream' = DSC_CluStream(m=100, k=2)
 )
 @
 
@@ -294,7 +294,6 @@ with the true number of clusters $k=2$.
 <<>>=
 n <- 5000
 horizon <- 250
-reset_stream(stream)
 
 evaluation <- lapply(algorithms, FUN=function(a) {
   reset_stream(stream)
@@ -394,7 +393,7 @@ Then we define a \code{DSC_MCOD} clusterer. Since this is a single-pass clustere
 call evaluation.
 <<outlier3>>=
 reset_stream(stream)
-mic_c <- DSC_MCOD(r = 2.5, w = 1000)
+mic_c <- DSOutlier_MCOD(r = 2.5, w = 1000)
 evaluate(mic_c, stream, n = 1000, type = "micro",
          measure = c("crand","outlierjaccard"))
 @
@@ -426,7 +425,7 @@ number of nighbor data points, to get more micro-clusters. However, this might a
 outlier detection capability.
 <<outlier6>>=
 reset_stream(stream)
-mic_c <- DSC_MCOD(r = 1.5, w = 1000, t = 10)
+mic_c <- DSOutlier_MCOD(r = 1.5, w = 1000, t = 10)
 mac_c <- DSC_Kmeans(3)
 tp_c <- DSC_TwoStage(mic_c, mac_c)
 evaluate(tp_c, stream, n = 1000, type = "macro",

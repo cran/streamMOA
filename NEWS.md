@@ -1,3 +1,8 @@
+#  Changes in version 1.2-4 (05/09/22)
+
+* Removed registry
+* We use now roxygen2
+
 #  Changes in version 1.2-3 (12/3/20)
 
 * Added wrapper for the MCOD algorithm, to support outlier detection additions in the stream package. (Dalibor Krleža)
