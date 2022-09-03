@@ -17,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-
 #' Random RBF Generator Events Data Stream Generator
 #'
 #' A class that generates random data based on RandomRBFGeneratorEvents
@@ -25,8 +24,8 @@
 #'
 #' There are an assortment of parameters available for the underlying MOA data
 #' structure, however, we have currently limited the available parameters to
-#' the arguments above.  Currently the modelSeed and instanceSeed are set to
-#' default values every time a \code{DSD_MOA} is created, therefore the
+#' the arguments above.  Currently the `modelSeed` and `instanceSeed` are set to
+#' default values every time a `DSD_MOA` is created, therefore the
 #' generated data will be the same. Because of this, it is important to set the
 #' seed manually when different data is needed.
 #'
@@ -34,9 +33,11 @@
 #' drift.  The locations of the clusters will change slightly, and they will
 #' merge with one another as time progresses.
 #'
+#' @family DSD_MOA
+#'
 #' @param k The average number of centroids in the model.
 #' @param d The dimensionality of the data.
-#' @param numClusterRange Range for numner of clusters.
+#' @param numClusterRange Range for number of clusters.
 #' @param kernelRadius The average radius of the micro-clusters.
 #' @param kernelRadiusRange Deviation of the number of centroids in the model.
 #' @param densityRange Density range.
@@ -49,24 +50,23 @@
 #' @param eventDeleteCreate Delete and create?
 #' @param modelSeed Random seed for the model.
 #' @param instanceSeed Random seed for the instances.
-#' @return An object of class \code{DSD_RandomRBFGeneratorEvent} (subclass of
-#' \code{DSD_MOA}, \code{DSD}).
+#' @return An object of class `DSD_RandomRBFGeneratorEvent` (subclass of
+#' `DSD_MOA`, [DSD]).
 #' @author Michael Hahsler and John Forrest
-#' @seealso \code{\link{DSD}}
-#' @references MOA: Massive Online Analysis, a Framework for Stream
-#' Classification and Clustering Albert Bifet, Geoff Holmes, Bernhard
+#' @references
+#' Albert Bifet, Geoff Holmes, Bernhard
 #' Pfahringer, Philipp Kranen, Hardy Kremer, Timm Jansen, Thomas Seidl.
-#' Journal of Machine Learning Research (JMLR).
+#' MOA: Massive Online Analysis, a Framework for Stream
+#' Classification and Clustering
+#' _Journal of Machine Learning Research (JMLR)_, 2010.
 #' @examples
-#'
 #' stream <- DSD_RandomRBFGeneratorEvents()
-#' get_points(stream, 10, class=TRUE)
+#' get_points(stream, 10)
 #'
-#' \dontrun{
-#' animate_data(stream, n=5000, pointInterval=100, xlim=c(0,1), ylim=c(0,1))
+#' if (interactive()) {
+#' animate_data(stream, n = 5000, horizon = 100, xlim = c(0, 1), ylim = c(0, 1))
 #' }
-#'
-#' @export DSD_RandomRBFGeneratorEvents
+#' @export
 DSD_RandomRBFGeneratorEvents <- function(k = 3,
   d = 2,
   numClusterRange = 3L,
@@ -128,7 +128,7 @@ DSD_RandomRBFGeneratorEvents <- function(k = 3,
   cliParams <- convert_params(paramList)
 
   # initializing the clusterer
-  strm <- .jnew("moa/streams/clustering/RandomRBFGeneratorEvents")
+  strm <- .jnew("moa/streams/clustering/RandomRBFGeneratorEvents", class.loader = .rJava.class.loader)
   options <-
     .jcall(strm, "Lcom/github/javacliparser/Options;", "getOptions")
   .jcall(options, "V", "setViaCLIString", cliParams)

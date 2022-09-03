@@ -1,3 +1,9 @@
+#  Changes in version 1.3-0 (09/03/22)
+
+* changes for stream_2.0.0.
+* we use now a package class loader for rJava.
+* Added DSClassifier_MOA to interface RMOA (which now also uses the class loader).
+
 #  Changes in version 1.2-4 (05/09/22)
 
 * Removed registry

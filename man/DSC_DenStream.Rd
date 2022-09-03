@@ -46,9 +46,9 @@ reachability at a distance of epsilon) be performed?}
 macro-clusters.}
 }
 \value{
-An object of class \code{DSC_DenStream} (subclass of \code{DSC},
-\code{DSC_MOA}, \code{DSC_Micro}) or, for \code{recluster=TRUE}, an object
-of class \code{DSC_TwoStage}.
+An object of class \code{DSC_DenStream} (subclass of \link{DSC},
+\link{DSC_MOA}, \link{DSC_Micro}) or, for \code{recluster = TRUE}, an object
+of class \link{DSC_TwoStage}.
 }
 \description{
 Interface for the DenStream cluster algorithm for data streams implemented
@@ -64,8 +64,8 @@ to find k clusters. This is achieved using single-link hierarchical
 clustering.
 }
 \examples{
-
 # data with 3 clusters and 5\% noise
+set.seed(1000)
 stream <- DSD_Gaussians(k = 3, d = 2, noise = 0.05)
 
 # use Den-Stream with reachability reclustering
@@ -74,7 +74,7 @@ update(denstream, stream, 500)
 denstream
 
 # plot macro-clusters
-plot(denstream, stream)
+plot(denstream, stream, type = "both")
 
 # plot micro-cluster
 plot(denstream, stream, type = "micro")
@@ -82,11 +82,10 @@ plot(denstream, stream, type = "micro")
 # show micro and macro-clusters
 plot(denstream, stream, type = "both")
 
-# reclustering. Choose reclustering reachability threshold automatically to find 3 clusters
-denstream2 <- DSC_DenStream(epsilon = .05, k = 3)
+# reclustering: Choose reclustering reachability threshold automatically to find 4 clusters
+denstream2 <- DSC_DenStream(epsilon = .05, k = 4)
 update(denstream2, stream, 500)
 plot(denstream2, stream, type = "both")
-
 }
 \references{
 Cao F, Ester M, Qian W, Zhou A (2006). Density-Based Clustering
@@ -98,8 +97,16 @@ Bifet A, Holmes G, Pfahringer B, Kranen P, Kremer H, Jansen T, Seidl T
 and Clustering. In Journal of Machine Learning Research (JMLR).
 }
 \seealso{
-\code{\link{DSC}}, \code{\link{DSC_Micro}}, \code{\link{DSC_MOA}}
+Other DSC_MOA: 
+\code{\link{DSC_BICO_MOA}()},
+\code{\link{DSC_CluStream}()},
+\code{\link{DSC_ClusTree}()},
+\code{\link{DSC_DStream_MOA}()},
+\code{\link{DSC_MCOD}()},
+\code{\link{DSC_MOA}()},
+\code{\link{DSC_StreamKM}()}
 }
 \author{
 Michael Hahsler and John Forrest
 }
+\concept{DSC_MOA}
