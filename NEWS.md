@@ -1,3 +1,10 @@
+#  Changes in version 1.3-1 (04/20/24)
+
+* Added DSRegressor_MOA to interface RMOA.
+* Updated man pages.
+* proxy is now imported.
+
+
 #  Changes in version 1.3-0 (09/03/22)
 
 * changes for stream_2.0.0.
